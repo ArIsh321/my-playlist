@@ -45,6 +45,7 @@ dependencies {
     def nav_version = "2.3.4"
     def lifecycle_version = "2.5.1"
     def timber_version = "4.7.1"
+    def permission_dispatcher = "4.9.2"
 
     implementation 'androidx.core:core-ktx:1.7.0'
     implementation 'androidx.appcompat:appcompat:1.5.1'
@@ -76,5 +77,10 @@ dependencies {
     kapt("androidx.lifecycle:lifecycle-compiler:$lifecycle_version")
 
     implementation("com.jakewharton.timber:timber:$timber_version")
+
+    implementation ("com.github.permissions-dispatcher:permissionsdispatcher:$permission_dispatcher")
+    kapt ("com.github.permissions-dispatcher:permissionsdispatcher-processor:$permission_dispatcher")
+    implementation "commons-io:commons-io:2.7"
+
 
 }
