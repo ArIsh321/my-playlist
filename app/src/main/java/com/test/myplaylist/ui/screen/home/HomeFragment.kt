@@ -11,6 +11,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.webkit.MimeTypeMap
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.test.myplaylist.base.BaseFragment
 import com.test.myplaylist.common.AlertDialogMessageData
 import com.test.myplaylist.databinding.FragmentHomeBinding
@@ -41,9 +42,12 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
     private val viewModel: HomeViewModel by provideViewModels()
     lateinit var cacheDir: File
+    private lateinit var musicListAdapter: MusicListAdapter
+
 
     override fun setupView() {
         super.setupView()
+        binding.lifecycleOwner = this
         with(binding) {
 
             onCheckOpenGalleriesWithPermissionCheck()
@@ -55,25 +59,21 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                         //If multiple image selected
                         if (data?.clipData != null) {
                             val count = data.clipData?.itemCount ?: 0
-                            Timber.d("dsdadsa${count}")
-
-//                        for (i in 0 until count) {
-//                            val imageUri: Uri? = data.clipData?.getItemAt(i)?.uri
-//                            val file = getImageFromUri(imageUri)
-//                            file?.let {
-//                                selectedPaths.add(it.absolutePath)
-//                            }
-//                        }
-//                        imageAdapter.addSelectedImages(selectedPaths)
+                            for (i in 0 until count) {
+                                val audioUri: Uri? = data.clipData?.getItemAt(i)?.uri
+                                val file = getAudioFromUri(audioUri)
+                                file?.let {
+                                    this@HomeFragment.viewModel.getAudioFile(it.absolutePath)
+                                }
+                            }
                         }
-                        //If single image selected
+                        //If single audio selected
                         else if (data?.data != null) {
-                            val imageUri: Uri? = data.data
-//                        val file = getImageFromUri(imageUri)
-//                        file?.let {
-//                            selectedPaths.add(it.absolutePath)
-//                        }
-//                        imageAdapter.addSelectedImages(selectedPaths)
+                            val audioUri: Uri? = data.data
+                            val file = getAudioFromUri(audioUri)
+                            file?.let {
+                                this@HomeFragment.viewModel.getAudioFile(it.absolutePath)
+                            }
                         }
                     }
                 }
@@ -84,16 +84,31 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                 intent.type = "*/*"
                 selectAudioActivityResult.launch(intent)
             }
-            try
-            {
+            try {
                 deleteTempFiles()
-            } catch (e: Exception){
+            } catch (e: Exception) {
             }
-
-            }
+        }
+        setupDataList()
     }
 
+    private fun setupDataList() {
+        with(binding.rvMusic) {
+            adapter = MusicListAdapter().also { musicListAdapter = it }
+            layoutManager = LinearLayoutManager(requireContext())
+            setHasFixedSize(true)
+        }
+    }
+
+
     override fun bindViewModel() {
+        viewModel.audioPath bindTo ::bindData
+    }
+
+    private fun bindData(data: List<String>) {
+        with(musicListAdapter) {
+            items = data.toMutableList()
+        }
     }
 
     @NeedsPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
@@ -113,13 +128,13 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         request.proceed()
     }
 
-    private fun getAudioFromUri(audioUri: Uri?) : File? {
+    private fun getAudioFromUri(audioUri: Uri?): File? {
         audioUri?.let { uri ->
             val mimeType = getMimeType(requireContext(), uri)
             mimeType?.let {
-                val file = createTmpFileFromUri(requireContext(), audioUri,"temp_audio", ".$it")
+                val file = createTmpFileFromUri(requireContext(), audioUri, "temp_audio", ".$it")
                 file?.let {
-                    Timber.d("audio Url = ${file.absolutePath}" )
+                    Timber.d("audio Url = ${file.absolutePath}")
                 }
                 return file
             }
@@ -142,11 +157,16 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         return extension
     }
 
-    private fun createTmpFileFromUri(context: Context, uri: Uri, fileName: String, mimeType: String): File? {
+    private fun createTmpFileFromUri(
+        context: Context,
+        uri: Uri,
+        fileName: String,
+        mimeType: String
+    ): File? {
         return try {
             val stream = context.contentResolver.openInputStream(uri)
-            val file = File.createTempFile(fileName, mimeType,cacheDir)
-            FileUtils.copyInputStreamToFile(stream,file)
+            val file = File.createTempFile(fileName, mimeType, cacheDir)
+            FileUtils.copyInputStreamToFile(stream, file)
             file
         } catch (e: Exception) {
             e.printStackTrace()
