@@ -33,12 +33,18 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+    buildFeatures {
+        viewBinding = true
+        dataBinding = true
+
+    }
 }
 
 dependencies {
     def hilt_version = "2.40.2"
     def nav_version = "2.3.4"
     def lifecycle_version = "2.5.1"
+    def timber_version = "4.7.1"
 
     implementation 'androidx.core:core-ktx:1.7.0'
     implementation 'androidx.appcompat:appcompat:1.5.1'
@@ -68,5 +74,7 @@ dependencies {
 
     // Annotation processor
     kapt("androidx.lifecycle:lifecycle-compiler:$lifecycle_version")
+
+    implementation("com.jakewharton.timber:timber:$timber_version")
 
 }
