@@ -9,4 +9,6 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     dispatchers: DispatchersProvider
-) : BaseViewModel(dispatchers)
+) : BaseViewModel(dispatchers) {
+
+}

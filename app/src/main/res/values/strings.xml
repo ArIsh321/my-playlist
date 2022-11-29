@@ -2,4 +2,11 @@
     <string name="app_name">MyPlayList</string>
     <string name="error_generic">Something went wrong</string>
     <string name="version">Version %s</string>
+    <string name="pick_music">Pick Music From Galley</string>
+    <string name="go_settings">Go to settings</string>
+    <string name="change_storage_permission_on_device_setting">Change storage permission in device setting?</string>
+    <string name="settings">Setting</string>
+    <string name="cancel">cancel</string>
+    <string name="ok">Ok</string>
+
 </resources>
