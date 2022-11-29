@@ -1,4 +1,4 @@
-package com.test.myplaylist.ui.screen
+package com.test.myplaylist.ui.screen.home
 
 
 import com.test.myplaylist.base.BaseViewModel
