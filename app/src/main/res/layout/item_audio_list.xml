@@ -35,7 +35,9 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="@dimen/sdp_16"
             android:progress="0"
+            android:progressDrawable="@drawable/custom_seekbar"
             android:splitTrack="false"
+            android:thumbTint="@android:color/transparent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/ivIcon"
             app:layout_constraintTop_toTopOf="parent" />
@@ -59,6 +61,7 @@
             android:layout_marginStart="@dimen/sdp_16"
             android:layout_marginTop="@dimen/sdp8"
             android:text="@{fileName}"
+            android:textColor="@color/black"
             android:layout_marginBottom="4dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"

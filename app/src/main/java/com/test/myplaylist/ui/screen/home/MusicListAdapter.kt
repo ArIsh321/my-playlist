@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.test.myplaylist.R
 import com.test.myplaylist.common.ItemClickable
 import com.test.myplaylist.common.ItemClickableImpl
-import com.test.myplaylist.data.Music
+import com.test.myplaylist.domain.Music
 import com.test.myplaylist.databinding.ItemAudioListBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

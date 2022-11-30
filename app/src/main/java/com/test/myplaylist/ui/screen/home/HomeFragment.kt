@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.test.myplaylist.base.BaseFragment
 import com.test.myplaylist.common.AlertDialogMessageData
-import com.test.myplaylist.data.Music
+import com.test.myplaylist.domain.Music
 import com.test.myplaylist.databinding.FragmentHomeBinding
 import com.test.myplaylist.extension.provideViewModels
 import com.test.myplaylist.extension.showAlertDialogFragment

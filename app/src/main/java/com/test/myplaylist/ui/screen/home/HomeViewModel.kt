@@ -2,7 +2,7 @@ package com.test.myplaylist.ui.screen.home
 
 
 import com.test.myplaylist.base.BaseViewModel
-import com.test.myplaylist.data.Music
+import com.test.myplaylist.domain.Music
 import com.test.myplaylist.util.DispatchersProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

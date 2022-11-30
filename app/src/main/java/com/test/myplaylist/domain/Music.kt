@@ -1,4 +1,4 @@
-package com.test.myplaylist.data
+package com.test.myplaylist.domain
 
 data class Music(
     var name: String,
