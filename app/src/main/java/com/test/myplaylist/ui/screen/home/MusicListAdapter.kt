@@ -8,18 +8,17 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.SeekBar
 import androidx.recyclerview.widget.RecyclerView
-import com.test.myplaylist.R
 import com.test.myplaylist.common.ItemClickable
 import com.test.myplaylist.common.ItemClickableImpl
-import com.test.myplaylist.domain.Music
 import com.test.myplaylist.databinding.ItemAudioListBinding
+import com.test.myplaylist.domain.Music
+import com.test.myplaylist.extension.calculateDuration
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.io.IOException
-import java.util.concurrent.TimeUnit
 
 @SuppressLint("NotifyDataSetChanged")
 internal class MusicListAdapter :
@@ -30,10 +29,6 @@ internal class MusicListAdapter :
             field = value
             notifyDataSetChanged()
         }
-
-    lateinit var mediaPlayer: MediaPlayer
-    var seekHandler = Handler()
-    var runnable: Runnable? = null
 
     override fun getItemCount() = items.size
 
@@ -54,13 +49,21 @@ internal class MusicListAdapter :
         }
     }
 
-    fun pauseAudio() {
-        mediaPlayer.stop()
-        mediaPlayer.reset()
+    fun onPauseAllAudio(m: Music) {
+        items.forEachIndexed { index, music ->
+            if (m.name == music!!.name) return@forEachIndexed
+            music.isPlaying = false
+            notifyItemChanged(index)
+        }
     }
 
-    fun updateItemData(data: Music) {
-
+    fun updateItem(m: Music) {
+        items.forEachIndexed { index, music ->
+            if (m.name == music!!.name) {
+                items[index] = m
+                notifyItemChanged(index)
+            }
+        }
     }
 
 
@@ -69,132 +72,28 @@ internal class MusicListAdapter :
     ) : RecyclerView.ViewHolder(binding.root) {
 
         init {
-            binding.root.setOnClickListener {
-                items[adapterPosition]?.let { data ->
-                    CoroutineScope(Dispatchers.IO).launch {
-                        data.let {
-                        }
-                    }
-                }
-            }
+
         }
 
         fun bind(model: Music?) {
             model?.let { data ->
                 with(binding) {
                     fileName = data.name
-                    playAudio(data.filePath)
-                }
-            }
-        }
-
-        private fun playAudio(data: String) {
-            mediaPlayer = MediaPlayer()
-            mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC)
-            try {
-                mediaPlayer.setDataSource(data)
-                mediaPlayer.prepare()
-            } catch (e: IOException) {
-                Timber.d("error ${e.printStackTrace()}")
-            }
-
-            with(binding) {
-                seekBar.max = mediaPlayer.duration
-                seekBar.tag = layoutPosition
-                audioFileName.text = "(" + "0:0/" + calculateDuration(
-                    mediaPlayer.duration
-                ) + ")"
-
-                seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-                    override fun onProgressChanged(
-                        seekBar: SeekBar,
-                        progress: Int,
-                        fromUser: Boolean,
-                    ) {
-                        if (mediaPlayer != null && fromUser) {
-                            mediaPlayer.seekTo(progress)
+                    music = data
+                    ivIcon.setOnClickListener {
+                        CoroutineScope((Dispatchers.IO)).launch {
+                            data.isPlaying = !data.isPlaying
+                            music = data
+                            notifyItemClick(OnItemClick.OnPlayAudio(data))
                         }
                     }
-
-                    override fun onStartTrackingTouch(seekBar: SeekBar) {}
-                    override fun onStopTrackingTouch(seekBar: SeekBar) {}
-                })
-
-                ivIcon.setOnClickListener {
-                    if (!mediaPlayer.isPlaying) {
-                        mediaPlayer.start()
-                        ivIcon.setImageResource(R.drawable.ic_pause)
-                        runnable = Runnable {
-                            // Updateing SeekBar every 100 miliseconds
-                            seekBar.progress = mediaPlayer.currentPosition
-                            seekHandler.postDelayed(runnable!!, 100)
-                            //For Showing time of audio(inside runnable)
-                            val miliSeconds = mediaPlayer.currentPosition
-                            val totalTime = mediaPlayer.duration
-
-                            if (miliSeconds != 0) {
-                                //if audio is playing, showing current time;
-                                val minutes =
-                                    TimeUnit.MILLISECONDS.toMinutes(miliSeconds.toLong())
-                                val seconds =
-                                    TimeUnit.MILLISECONDS.toSeconds(miliSeconds.toLong())
-                                if (minutes == 0L) {
-                                    audioFileName.text = "(0:$seconds/" + calculateDuration(
-                                        mediaPlayer.duration
-                                    ) + ")"
-                                } else {
-                                    if (seconds >= 60) {
-                                        val sec = seconds - minutes * 60
-                                        audioFileName.text = "($minutes:$sec/" + calculateDuration(
-                                            mediaPlayer.duration
-                                        ) + ")"
-                                    }
-                                }
-                            } else {
-                                //Displaying total time if audio not playing
-                                val minutes =
-                                    TimeUnit.MILLISECONDS.toMinutes(totalTime.toLong())
-                                val seconds =
-                                    TimeUnit.MILLISECONDS.toSeconds(totalTime.toLong())
-                                if (minutes == 0L) {
-                                    audioFileName.text = "(0:$seconds)"
-                                } else {
-                                    if (seconds >= 60) {
-                                        val sec = seconds - minutes * 60
-                                        audioFileName.text = "($minutes:$sec)"
-                                    }
-                                }
-                            }
-                        }
-                        (runnable as Runnable).run()
-                    } else {
-                        mediaPlayer.pause()
-                        ivIcon.setImageResource(R.drawable.ic_play)
-                    }
-
                 }
             }
         }
-
-        private fun calculateDuration(duration: Int): String? {
-            var finalDuration = ""
-            val minutes = TimeUnit.MILLISECONDS.toMinutes(duration.toLong())
-            val seconds = TimeUnit.MILLISECONDS.toSeconds(duration.toLong())
-            if (minutes == 0L) {
-                finalDuration = "0:$seconds"
-            } else {
-                if (seconds >= 60) {
-                    val sec = seconds - minutes * 60
-                    finalDuration = "$minutes:$sec"
-                }
-            }
-            return finalDuration
-        }
-
 
     }
 
     sealed class OnItemClick {
-        data class AUDIOITEM(val data: Music) : OnItemClick()
+        data class OnPlayAudio(val data: Music): OnItemClick()
     }
 }

@@ -2,15 +2,12 @@ package com.test.myplaylist.ui.screen.home
 
 import android.Manifest
 import android.app.Activity
-import android.content.ContentResolver
-import android.content.Context
 import android.content.Intent
 import android.content.Intent.ACTION_GET_CONTENT
 import android.media.MediaPlayer
 import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.webkit.MimeTypeMap
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -21,7 +18,6 @@ import com.test.myplaylist.domain.Music
 import com.test.myplaylist.extension.*
 import com.test.myplaylist.util.MainNavigator
 import dagger.hilt.android.AndroidEntryPoint
-import org.apache.commons.io.FileUtils
 import permissions.dispatcher.NeedsPermission
 import permissions.dispatcher.OnNeverAskAgain
 import permissions.dispatcher.OnShowRationale
@@ -50,10 +46,11 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
     private var mediaPlayer: MediaPlayer? = null
 
+    private var playAudioManager: PlayAudioManager? = null
+
     override fun setupView() {
         super.setupView()
         binding.lifecycleOwner = this
-        mediaPlayer = MediaPlayer()
         with(binding) {
             val selectAudioActivityResult =
                 registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -149,17 +146,11 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         super.bindViewEvents()
         musicListAdapter.itemClick.bindTo {
             when (it) {
-//                is MusicListAdapter.OnItemClick.AUDIOITEM -> {
-//                    mediaPlaying(it.data)
-//
-//                }
+                is MusicListAdapter.OnItemClick.OnPlayAudio ->{
+                    onPlayAudioMedia(it.data)
+                }
             }
         }
-    }
-
-    private fun mediaPlaying(data: Music) {
-        this@HomeFragment.viewModel.mediaListData(data,mediaPlayer)
-
     }
 
     @NeedsPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
@@ -193,7 +184,53 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         return null
     }
 
+    private fun onPlayAudioMedia(music: Music) {
+            if (playAudioManager != null && playAudioManager!!.isPlaying && music.name != playAudioManager!!.mediaPost.name) {
+                musicListAdapter.onPauseAllAudio(music)
+                playAudioManager!!.killMediaPlayer()
+            }
+            if (music.isPlaying) {
+                playAudioManager = PlayAudioManager(requireContext(), music, object : PlayAudioManager.ActionAudioListener{
+                    override fun duration(countdown: Long) {
+                        //todo update item progress
+
+                    }
+
+                    override fun onFinish() {
+                        music.isPlaying = false
+                        musicListAdapter.updateItem(music)
+                    }
+                })
+                try {
+                    playAudioManager!!.playAudio()
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            } else {
+                if (playAudioManager != null) {
+                    playAudioManager!!.killMediaPlayer()
+                }
+                music.isPlaying = false
+                musicListAdapter.updateItem(music)
+            }
+    }
+
+
+    override fun onDestroy() {
+        super.onDestroy()
+        playAudioManager?.killMediaPlayer()
+        if(mediaPlayer!=null){
+            mediaPlayer!!.stop()
+            mediaPlayer!!.reset()
+            mediaPlayer!!.release()
+            mediaPlayer = null
+        }
+    }
+
+
     companion object {
         private const val PERMISSIONS_SETTING = "permissions_setting"
     }
+
+
 }
