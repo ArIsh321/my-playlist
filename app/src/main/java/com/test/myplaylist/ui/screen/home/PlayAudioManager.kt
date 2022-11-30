@@ -5,7 +5,6 @@ import android.os.CountDownTimer
 import android.content.Context
 import android.net.Uri
 import com.test.myplaylist.domain.Music
-import com.test.myplaylist.domain.formatTimeUnit
 import java.lang.Exception
 
 class PlayAudioManager(
@@ -26,13 +25,13 @@ class PlayAudioManager(
         mediaPlayer!!.setOnCompletionListener { killMediaPlayer() }
         mediaPlayer!!.setOnPreparedListener { mediaPlayer: MediaPlayer ->
             countDownTimer = object : CountDownTimer(mediaPlayer.duration.toLong(), 1000) {
-                override fun onTick(l: Long) {
-                    listener?.duration(l)
+                override fun onTick(p0: Long) {
+                    listener?.duration(mediaPlayer.duration, p0)
                 }
 
                 override fun onFinish() {
                     if (listener != null) {
-                        listener.duration(0)
+                        listener.duration(0, 0)
                         listener.onFinish()
                     }
                 }
@@ -60,7 +59,7 @@ class PlayAudioManager(
     }
 
     interface ActionAudioListener {
-        fun duration(countdown: Long)
+        fun duration(totalDuration: Int, countdown: Long)
         fun onFinish()
     }
 }

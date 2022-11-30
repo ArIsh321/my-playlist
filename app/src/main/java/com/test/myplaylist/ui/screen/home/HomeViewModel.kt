@@ -1,20 +1,13 @@
 package com.test.myplaylist.ui.screen.home
 
 
-import android.media.AudioManager
-import android.media.MediaPlayer
 import com.test.myplaylist.base.BaseViewModel
-import com.test.myplaylist.data.storage.NormalSharedPreferences
 import com.test.myplaylist.domain.Music
 import com.test.myplaylist.util.DispatchersProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.flow.updateAndGet
-import timber.log.Timber
 import java.io.File
-import java.io.IOException
 import javax.inject.Inject
 
 @HiltViewModel

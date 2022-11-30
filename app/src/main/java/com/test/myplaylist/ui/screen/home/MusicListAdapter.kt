@@ -1,24 +1,18 @@
 package com.test.myplaylist.ui.screen.home
 
 import android.annotation.SuppressLint
-import android.media.AudioManager
-import android.media.MediaPlayer
 import android.os.Handler
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.SeekBar
 import androidx.recyclerview.widget.RecyclerView
 import com.test.myplaylist.common.ItemClickable
 import com.test.myplaylist.common.ItemClickableImpl
 import com.test.myplaylist.databinding.ItemAudioListBinding
 import com.test.myplaylist.domain.Music
-import com.test.myplaylist.extension.calculateDuration
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.launch
-import timber.log.Timber
-import java.io.IOException
 
 @SuppressLint("NotifyDataSetChanged")
 internal class MusicListAdapter :
@@ -70,11 +64,6 @@ internal class MusicListAdapter :
     internal inner class ViewHolderItem(
         private val binding: ItemAudioListBinding,
     ) : RecyclerView.ViewHolder(binding.root) {
-
-        init {
-
-        }
-
         fun bind(model: Music?) {
             model?.let { data ->
                 with(binding) {
@@ -89,11 +78,11 @@ internal class MusicListAdapter :
                     }
                 }
             }
-        }
-
     }
 
-    sealed class OnItemClick {
-        data class OnPlayAudio(val data: Music): OnItemClick()
-    }
+}
+
+sealed class OnItemClick {
+    data class OnPlayAudio(val data: Music) : OnItemClick()
+}
 }

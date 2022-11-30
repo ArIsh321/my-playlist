@@ -6,7 +6,6 @@ import android.net.Uri
 import android.webkit.MimeTypeMap
 import org.apache.commons.io.FileUtils
 import java.io.File
-import java.util.concurrent.TimeUnit
 
 fun Context.getMimeType( uri: Uri): String? {
     //Check uri format to avoid null
@@ -52,21 +51,6 @@ fun Context.getMimeType( uri: Uri): String? {
         }
     }
     return file.delete()
-}
-
-fun Int.calculateDuration(): String? {
-    var finalDuration = ""
-    val minutes = TimeUnit.MILLISECONDS.toMinutes(this.toLong())
-    val seconds = TimeUnit.MILLISECONDS.toSeconds(this.toLong())
-    if (minutes == 0L) {
-        finalDuration = "0:$seconds"
-    } else {
-        if (seconds >= 60) {
-            val sec = seconds - minutes * 60
-            finalDuration = "$minutes:$sec"
-        }
-    }
-    return finalDuration
 }
 
 
