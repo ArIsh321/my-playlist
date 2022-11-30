@@ -7,6 +7,9 @@
         <variable
             name="fileName"
             type="String" />
+        <variable
+            name="music"
+            type="com.test.myplaylist.domain.Music" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -21,7 +24,7 @@
             android:layout_height="@dimen/sdp_32"
             android:layout_marginStart="@dimen/sdp_16"
             android:scaleType="centerCrop"
-            android:src="@drawable/ic_play"
+            android:src="@{music.playing? @drawable/ic_pause : @drawable/ic_play}"
             app:layout_constraintBottom_toBottomOf="@+id/seekBar"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/seekBar"

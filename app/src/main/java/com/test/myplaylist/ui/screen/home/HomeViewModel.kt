@@ -35,15 +35,4 @@ class HomeViewModel @Inject constructor(
         _audioPath.value.add(music)
     }
 
-    fun mediaListData(data: Music, mediaPlayer: MediaPlayer?) {
-        _mediaData.value = data
-        if(data.isPlaying){
-            _mediaData.update { it.copy(isPlaying = false) }
-
-        }else{
-            _mediaData.update { it.copy(duration = mediaPlayer!!.duration) }
-            _mediaData.update { it.copy(isPlaying = true) }
-        }
-
-    }
 }
