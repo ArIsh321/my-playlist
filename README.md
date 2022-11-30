@@ -3,7 +3,7 @@
 Architecture Pattern 
 MVVM
 
-Dependency Inject 
+Dependency Injection
 HILT
 
 Permission Dispatcher for Permission
