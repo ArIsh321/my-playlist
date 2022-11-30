@@ -3,8 +3,11 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="app/src/main/res/drawable/custom_seekbar.xml" value="0.1485" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.1" />
         <entry key="app/src/main/res/layout/fragment_home.xml" value="0.28177083333333336" />
+        <entry key="app/src/main/res/layout/fragment_landing_screen.xml" value="0.2405517578125" />
+        <entry key="app/src/main/res/layout/item_audio_list.xml" value="0.2774358974358974" />
       </map>
     </option>
   </component>
