@@ -44,7 +44,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
     private val viewModel: HomeViewModel by provideViewModels()
     private lateinit var musicListAdapter: MusicListAdapter
-
+    private var firstVisibleItemPosition = -1
 
     override fun setupView() {
         super.setupView()
@@ -105,8 +105,19 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
             setHasFixedSize(true)
             addOnScrollListener(object : RecyclerView.OnScrollListener() {
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                    val itemSize = musicListAdapter.items.size
+                    firstVisibleItemPosition =
+                        (binding.rvMusic.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
+                }
 
+                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                    super.onScrollStateChanged(recyclerView, newState)
+                    val layoutManager = recyclerView.layoutManager
+
+                    if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                        val visibleItemCount = layoutManager!!.childCount
+                        val findLastVisibleItemPosition =
+                            (binding.rvMusic.layoutManager as LinearLayoutManager).findLastCompletelyVisibleItemPosition()
+                    }
                 }
             })
         }
@@ -121,19 +132,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         with(musicListAdapter) {
             items = data.toMutableList()
         }
-    }
-
-    override fun bindViewEvents() {
-        super.bindViewEvents()
-//        musicListAdapter.itemClick.bindTo {
-//            when (it) {
-//                is MusicListAdapter.OnItemClick.AUDIOITEM -> {
-//                    playAudio(it.data)
-//                }
-//                else -> {}
-//            }
-//        }
-
     }
 
     @NeedsPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
@@ -157,7 +155,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         audioUri?.let { uri ->
             val mimeType = getMimeType(requireContext(), uri)
             mimeType?.let {
-                val file = createTmpFileFromUri(requireContext(), audioUri, "temp_audio", ".$it")
+                val file = createTmpFileFromUri(requireContext(), audioUri, "audio", ".$it")
                 file?.let {
                     Timber.d("audio Url = ${file.absolutePath}")
                 }
