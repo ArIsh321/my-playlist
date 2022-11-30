@@ -13,6 +13,7 @@ import com.test.myplaylist.common.ItemClickable
 import com.test.myplaylist.common.ItemClickableImpl
 import com.test.myplaylist.domain.Music
 import com.test.myplaylist.databinding.ItemAudioListBinding
+import com.test.myplaylist.extension.calculateDuration
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Runnable
@@ -59,11 +60,6 @@ internal class MusicListAdapter :
         mediaPlayer.reset()
     }
 
-    fun updateItemData(data: Music) {
-
-    }
-
-
     internal inner class ViewHolderItem(
         private val binding: ItemAudioListBinding,
     ) : RecyclerView.ViewHolder(binding.root) {
@@ -101,9 +97,7 @@ internal class MusicListAdapter :
             with(binding) {
                 seekBar.max = mediaPlayer.duration
                 seekBar.tag = layoutPosition
-                audioFileName.text = "(" + "0:0/" + calculateDuration(
-                    mediaPlayer.duration
-                ) + ")"
+                audioFileName.text = "(" + "0:0/" + mediaPlayer.duration.calculateDuration() + ")"
 
                 seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
                     override fun onProgressChanged(
@@ -139,15 +133,11 @@ internal class MusicListAdapter :
                                 val seconds =
                                     TimeUnit.MILLISECONDS.toSeconds(miliSeconds.toLong())
                                 if (minutes == 0L) {
-                                    audioFileName.text = "(0:$seconds/" + calculateDuration(
-                                        mediaPlayer.duration
-                                    ) + ")"
+                                    audioFileName.text = "(0:$seconds/" + mediaPlayer.duration.calculateDuration()+ ")"
                                 } else {
                                     if (seconds >= 60) {
                                         val sec = seconds - minutes * 60
-                                        audioFileName.text = "($minutes:$sec/" + calculateDuration(
-                                            mediaPlayer.duration
-                                        ) + ")"
+                                        audioFileName.text = "($minutes:$sec/" + mediaPlayer.duration.calculateDuration() + ")"
                                     }
                                 }
                             } else {
@@ -175,22 +165,6 @@ internal class MusicListAdapter :
                 }
             }
         }
-
-        private fun calculateDuration(duration: Int): String? {
-            var finalDuration = ""
-            val minutes = TimeUnit.MILLISECONDS.toMinutes(duration.toLong())
-            val seconds = TimeUnit.MILLISECONDS.toSeconds(duration.toLong())
-            if (minutes == 0L) {
-                finalDuration = "0:$seconds"
-            } else {
-                if (seconds >= 60) {
-                    val sec = seconds - minutes * 60
-                    finalDuration = "$minutes:$sec"
-                }
-            }
-            return finalDuration
-        }
-
 
     }
 

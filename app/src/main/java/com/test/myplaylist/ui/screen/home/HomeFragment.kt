@@ -196,4 +196,9 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     companion object {
         private const val PERMISSIONS_SETTING = "permissions_setting"
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mediaPlayer!!.stop()
+    }
 }
