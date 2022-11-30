@@ -6,16 +6,16 @@ import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
 import android.content.Intent.ACTION_GET_CONTENT
-import android.media.AudioManager
-import android.media.MediaPlayer
 import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.webkit.MimeTypeMap
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.test.myplaylist.base.BaseFragment
 import com.test.myplaylist.common.AlertDialogMessageData
+import com.test.myplaylist.data.Music
 import com.test.myplaylist.databinding.FragmentHomeBinding
 import com.test.myplaylist.extension.provideViewModels
 import com.test.myplaylist.extension.showAlertDialogFragment
@@ -28,8 +28,6 @@ import permissions.dispatcher.OnShowRationale
 import permissions.dispatcher.RuntimePermissions
 import timber.log.Timber
 import java.io.File
-import java.io.IOError
-import java.io.IOException
 import javax.inject.Inject
 
 @RuntimePermissions
@@ -71,7 +69,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                                 val file = getAudioFromUri(audioUri)
                                 file?.let {
                                     Timber.d("audioPath==${it.absolutePath}")
-                                    this@HomeFragment.viewModel.getAudioFile(it.absolutePath)
+                                    this@HomeFragment.viewModel.getAudioFile(it)
                                 }
                             }
                         }
@@ -80,7 +78,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                             val audioUri: Uri? = data.data
                             val file = getAudioFromUri(audioUri)
                             file?.let {
-                                this@HomeFragment.viewModel.getAudioFile(it.absolutePath)
+                                this@HomeFragment.viewModel.getAudioFile(it)
                             }
                         }
                     }
@@ -105,6 +103,12 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
             adapter = MusicListAdapter().also { musicListAdapter = it }
             layoutManager = LinearLayoutManager(requireContext())
             setHasFixedSize(true)
+            addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    val itemSize = musicListAdapter.items.size
+
+                }
+            })
         }
     }
 
@@ -113,7 +117,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         viewModel.audioPath bindTo ::bindData
     }
 
-    private fun bindData(data: List<String>) {
+    private fun bindData(data: List<Music>) {
         with(musicListAdapter) {
             items = data.toMutableList()
         }
