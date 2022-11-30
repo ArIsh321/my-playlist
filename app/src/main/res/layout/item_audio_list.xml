@@ -21,7 +21,7 @@
             android:layout_height="@dimen/sdp_32"
             android:layout_marginStart="@dimen/sdp_16"
             android:scaleType="centerCrop"
-            android:src="@drawable/ic_audio_track"
+            android:src="@drawable/ic_play"
             app:layout_constraintBottom_toBottomOf="@+id/seekBar"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/seekBar"
@@ -35,9 +35,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="@dimen/sdp_16"
             android:progress="0"
-            android:progressDrawable="@drawable/custom_seekbar"
             android:splitTrack="false"
-            android:thumbTint="@android:color/transparent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/ivIcon"
             app:layout_constraintTop_toTopOf="parent" />

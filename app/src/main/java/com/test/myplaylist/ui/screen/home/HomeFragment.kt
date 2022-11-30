@@ -6,6 +6,7 @@ import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
 import android.content.Intent.ACTION_GET_CONTENT
+import android.media.MediaPlayer
 import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -15,10 +16,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.test.myplaylist.base.BaseFragment
 import com.test.myplaylist.common.AlertDialogMessageData
-import com.test.myplaylist.domain.Music
 import com.test.myplaylist.databinding.FragmentHomeBinding
-import com.test.myplaylist.extension.provideViewModels
-import com.test.myplaylist.extension.showAlertDialogFragment
+import com.test.myplaylist.domain.Music
+import com.test.myplaylist.extension.*
 import com.test.myplaylist.util.MainNavigator
 import dagger.hilt.android.AndroidEntryPoint
 import org.apache.commons.io.FileUtils
@@ -37,6 +37,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     @Inject
     lateinit var navigator: MainNavigator
 
+
     override val bindingInflater: (LayoutInflater, ViewGroup?, Boolean) -> FragmentHomeBinding
         get() = { inflater, container, attachToParent ->
             FragmentHomeBinding.inflate(inflater, container, attachToParent)
@@ -44,15 +45,16 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
     private val viewModel: HomeViewModel by provideViewModels()
     private lateinit var musicListAdapter: MusicListAdapter
+    private var lastVisibleItemPosition = -1
     private var firstVisibleItemPosition = -1
+
+    private var mediaPlayer: MediaPlayer? = null
 
     override fun setupView() {
         super.setupView()
         binding.lifecycleOwner = this
+        mediaPlayer = MediaPlayer()
         with(binding) {
-
-            onCheckOpenGalleriesWithPermissionCheck()
-
             val selectAudioActivityResult =
                 registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                     if (result.resultCode == Activity.RESULT_OK) {
@@ -85,13 +87,14 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                 }
 
             btnSelectImage.setOnClickListener {
+                onCheckOpenGalleriesWithPermissionCheck()
                 val intent = Intent(ACTION_GET_CONTENT)
                 intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
                 intent.type = "audio/*"
                 selectAudioActivityResult.launch(intent)
             }
             try {
-                deleteTempFiles()
+                context?.deleteTempFiles()
             } catch (e: Exception) {
             }
         }
@@ -105,20 +108,28 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
             setHasFixedSize(true)
             addOnScrollListener(object : RecyclerView.OnScrollListener() {
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                    firstVisibleItemPosition =
-                        (binding.rvMusic.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
+                    when (val layoutManager = recyclerView.layoutManager) {
+                        is LinearLayoutManager -> {
+                            lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition()
+                            firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
+                        }
+                    }
                 }
 
                 override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                     super.onScrollStateChanged(recyclerView, newState)
                     val layoutManager = recyclerView.layoutManager
-
+                    val totalItemCount = layoutManager!!.itemCount
+                    val visibleItemCount = layoutManager.childCount
                     if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                        val visibleItemCount = layoutManager!!.childCount
-                        val findLastVisibleItemPosition =
-                            (binding.rvMusic.layoutManager as LinearLayoutManager).findLastCompletelyVisibleItemPosition()
+                        if (visibleItemCount > 0 && lastVisibleItemPosition >= totalItemCount - 1) {
+
+                        }
+                        if (firstVisibleItemPosition == 0) {
+                        }
                     }
                 }
+
             })
         }
     }
@@ -132,6 +143,23 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         with(musicListAdapter) {
             items = data.toMutableList()
         }
+    }
+
+    override fun bindViewEvents() {
+        super.bindViewEvents()
+        musicListAdapter.itemClick.bindTo {
+            when (it) {
+//                is MusicListAdapter.OnItemClick.AUDIOITEM -> {
+//                    mediaPlaying(it.data)
+//
+//                }
+            }
+        }
+    }
+
+    private fun mediaPlaying(data: Music) {
+        this@HomeFragment.viewModel.mediaListData(data,mediaPlayer)
+
     }
 
     @NeedsPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
@@ -153,9 +181,9 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
     private fun getAudioFromUri(audioUri: Uri?): File? {
         audioUri?.let { uri ->
-            val mimeType = getMimeType(requireContext(), uri)
+            val mimeType = context?.getMimeType(uri)
             mimeType?.let {
-                val file = createTmpFileFromUri(requireContext(), audioUri, "audio", ".$it")
+                val file = context?.createTmpFileFromUri( audioUri, "audio", ".$it")
                 file?.let {
                     Timber.d("audio Url = ${file.absolutePath}")
                 }
@@ -163,54 +191,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
             }
         }
         return null
-    }
-
-
-    private fun getMimeType(context: Context, uri: Uri): String? {
-        //Check uri format to avoid null
-        val extension: String? = if (uri.scheme == ContentResolver.SCHEME_CONTENT) {
-            //If scheme is a content
-            val mime = MimeTypeMap.getSingleton()
-            mime.getExtensionFromMimeType(context.contentResolver.getType(uri))
-        } else {
-            //If scheme is a File
-            //This will replace white spaces with %20 and also other special characters. This will avoid returning null values on file name with spaces and special characters.
-            MimeTypeMap.getFileExtensionFromUrl(Uri.fromFile(File(uri.path)).toString())
-        }
-        return extension
-    }
-
-    private fun createTmpFileFromUri(
-        context: Context,
-        uri: Uri,
-        fileName: String,
-        mimeType: String
-    ): File? {
-        return try {
-            val stream = context.contentResolver.openInputStream(uri)
-            val file = File.createTempFile(fileName, mimeType, activity?.cacheDir)
-            FileUtils.copyInputStreamToFile(stream, file)
-            file
-        } catch (e: Exception) {
-            e.printStackTrace()
-            null
-        }
-    }
-
-    private fun deleteTempFiles(file: File = activity!!.cacheDir): Boolean {
-        if (file.isDirectory) {
-            val files = file.listFiles()
-            if (files != null) {
-                for (f in files) {
-                    if (f.isDirectory) {
-                        deleteTempFiles(f)
-                    } else {
-                        f.delete()
-                    }
-                }
-            }
-        }
-        return file.delete()
     }
 
     companion object {

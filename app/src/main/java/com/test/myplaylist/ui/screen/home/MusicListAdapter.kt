@@ -59,6 +59,10 @@ internal class MusicListAdapter :
         mediaPlayer.reset()
     }
 
+    fun updateItemData(data: Music) {
+
+    }
+
 
     internal inner class ViewHolderItem(
         private val binding: ItemAudioListBinding,
@@ -119,7 +123,6 @@ internal class MusicListAdapter :
                 ivIcon.setOnClickListener {
                     if (!mediaPlayer.isPlaying) {
                         mediaPlayer.start()
-//                        holder.btn_play.setText("Pause")
                         ivIcon.setImageResource(R.drawable.ic_pause)
                         runnable = Runnable {
                             // Updateing SeekBar every 100 miliseconds
@@ -192,6 +195,6 @@ internal class MusicListAdapter :
     }
 
     sealed class OnItemClick {
-        data class AUDIOITEM(val data: String) : OnItemClick()
+        data class AUDIOITEM(val data: Music) : OnItemClick()
     }
 }
