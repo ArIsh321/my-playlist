@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.Intent.ACTION_GET_CONTENT
 import android.media.MediaPlayer
 import android.net.Uri
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
@@ -33,7 +34,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     @Inject
     lateinit var navigator: MainNavigator
 
-
     override val bindingInflater: (LayoutInflater, ViewGroup?, Boolean) -> FragmentHomeBinding
         get() = { inflater, container, attachToParent ->
             FragmentHomeBinding.inflate(inflater, container, attachToParent)
@@ -41,11 +41,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
     private val viewModel: HomeViewModel by provideViewModels()
     private lateinit var musicListAdapter: MusicListAdapter
-    private var lastVisibleItemPosition = -1
-    private var firstVisibleItemPosition = -1
-
-    private var mediaPlayer: MediaPlayer? = null
-
     private var playAudioManager: PlayAudioManager? = null
 
     override fun setupView() {
@@ -57,12 +52,10 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                     if (result.resultCode == Activity.RESULT_OK) {
                         val data: Intent? = result.data
                         Timber.d("audioPath==${data?.data}")
-
                         //If multiple image selected
                         if (data?.clipData != null) {
                             val count = data.clipData?.itemCount ?: 0
                             Timber.d("audioPath==$count")
-
                             for (i in 0 until count) {
                                 val audioUri: Uri? = data.clipData?.getItemAt(i)?.uri
                                 val file = getAudioFromUri(audioUri)
@@ -103,34 +96,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
             adapter = MusicListAdapter().also { musicListAdapter = it }
             layoutManager = LinearLayoutManager(requireContext())
             setHasFixedSize(true)
-            addOnScrollListener(object : RecyclerView.OnScrollListener() {
-                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                    when (val layoutManager = recyclerView.layoutManager) {
-                        is LinearLayoutManager -> {
-                            lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition()
-                            firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
-                        }
-                    }
-                }
-
-                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                    super.onScrollStateChanged(recyclerView, newState)
-                    val layoutManager = recyclerView.layoutManager
-                    val totalItemCount = layoutManager!!.itemCount
-                    val visibleItemCount = layoutManager.childCount
-                    if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                        if (visibleItemCount > 0 && lastVisibleItemPosition >= totalItemCount - 1) {
-
-                        }
-                        if (firstVisibleItemPosition == 0) {
-                        }
-                    }
-                }
-
-            })
         }
     }
-
 
     override fun bindViewModel() {
         viewModel.audioPath bindTo ::bindData
@@ -191,9 +158,10 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
             }
             if (music.isPlaying) {
                 playAudioManager = PlayAudioManager(requireContext(), music, object : PlayAudioManager.ActionAudioListener{
-                    override fun duration(countdown: Long) {
-                        //todo update item progress
-
+                    override fun duration(totalDuration: Int, countdown: Long) {
+                        music.duration = totalDuration
+                        music.durationSeek = countdown.toInt()
+                        musicListAdapter.updateItem(music)
                     }
 
                     override fun onFinish() {
@@ -219,14 +187,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     override fun onDestroy() {
         super.onDestroy()
         playAudioManager?.killMediaPlayer()
-        if(mediaPlayer!=null){
-            mediaPlayer!!.stop()
-            mediaPlayer!!.reset()
-            mediaPlayer!!.release()
-            mediaPlayer = null
-        }
     }
-
 
     companion object {
         private const val PERMISSIONS_SETTING = "permissions_setting"
