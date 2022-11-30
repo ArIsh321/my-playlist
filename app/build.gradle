@@ -44,8 +44,10 @@ dependencies {
     def hilt_version = "2.40.2"
     def nav_version = "2.3.4"
     def lifecycle_version = "2.5.1"
+    def moshi_version = "1.12.0"
     def timber_version = "4.7.1"
     def permission_dispatcher = "4.9.2"
+    def retrofit_version = "2.9.0"
 
     implementation 'androidx.core:core-ktx:1.7.0'
     implementation 'androidx.appcompat:appcompat:1.5.1'
@@ -82,5 +84,9 @@ dependencies {
     kapt ("com.github.permissions-dispatcher:permissionsdispatcher-processor:$permission_dispatcher")
     implementation "commons-io:commons-io:2.7"
 
+    api("com.squareup.retrofit2:retrofit:$retrofit_version}")
+    api("com.squareup.retrofit2:converter-moshi:$retrofit_version")
+    api("com.squareup.moshi:moshi-adapters:$moshi_version")
+    api("com.squareup.moshi:moshi-kotlin:$moshi_version")
 
 }

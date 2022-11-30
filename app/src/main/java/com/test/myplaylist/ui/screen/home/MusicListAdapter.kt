@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.test.myplaylist.R
 import com.test.myplaylist.common.ItemClickable
 import com.test.myplaylist.common.ItemClickableImpl
-import com.test.myplaylist.data.Music
+import com.test.myplaylist.domain.Music
 import com.test.myplaylist.databinding.ItemAudioListBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -57,6 +57,10 @@ internal class MusicListAdapter :
     fun pauseAudio() {
         mediaPlayer.stop()
         mediaPlayer.reset()
+    }
+
+    fun updateItemData(data: Music) {
+
     }
 
 
@@ -119,7 +123,6 @@ internal class MusicListAdapter :
                 ivIcon.setOnClickListener {
                     if (!mediaPlayer.isPlaying) {
                         mediaPlayer.start()
-//                        holder.btn_play.setText("Pause")
                         ivIcon.setImageResource(R.drawable.ic_pause)
                         runnable = Runnable {
                             // Updateing SeekBar every 100 miliseconds
@@ -192,6 +195,6 @@ internal class MusicListAdapter :
     }
 
     sealed class OnItemClick {
-        data class AUDIOITEM(val data: String) : OnItemClick()
+        data class AUDIOITEM(val data: Music) : OnItemClick()
     }
 }
