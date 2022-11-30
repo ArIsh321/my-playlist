@@ -6,9 +6,13 @@ MVVM
 Dependency Inject 
 HILT
 
+Permission Dispatcher for Permission
+
 Navigation Component
 Data class
-SeekBar
+
+Seek Bar
+
 Sealed class
 
 Extension Function
