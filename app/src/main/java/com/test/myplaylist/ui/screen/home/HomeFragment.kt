@@ -6,6 +6,8 @@ import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
 import android.content.Intent.ACTION_GET_CONTENT
+import android.media.AudioManager
+import android.media.MediaPlayer
 import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -26,6 +28,8 @@ import permissions.dispatcher.OnShowRationale
 import permissions.dispatcher.RuntimePermissions
 import timber.log.Timber
 import java.io.File
+import java.io.IOError
+import java.io.IOException
 import javax.inject.Inject
 
 @RuntimePermissions
@@ -41,7 +45,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         }
 
     private val viewModel: HomeViewModel by provideViewModels()
-    lateinit var cacheDir: File
     private lateinit var musicListAdapter: MusicListAdapter
 
 
@@ -56,13 +59,18 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                 registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                     if (result.resultCode == Activity.RESULT_OK) {
                         val data: Intent? = result.data
+                        Timber.d("audioPath==${data?.data}")
+
                         //If multiple image selected
                         if (data?.clipData != null) {
                             val count = data.clipData?.itemCount ?: 0
+                            Timber.d("audioPath==$count")
+
                             for (i in 0 until count) {
                                 val audioUri: Uri? = data.clipData?.getItemAt(i)?.uri
                                 val file = getAudioFromUri(audioUri)
                                 file?.let {
+                                    Timber.d("audioPath==${it.absolutePath}")
                                     this@HomeFragment.viewModel.getAudioFile(it.absolutePath)
                                 }
                             }
@@ -81,7 +89,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
             btnSelectImage.setOnClickListener {
                 val intent = Intent(ACTION_GET_CONTENT)
                 intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
-                intent.type = "*/*"
+                intent.type = "audio/*"
                 selectAudioActivityResult.launch(intent)
             }
             try {
@@ -109,6 +117,19 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         with(musicListAdapter) {
             items = data.toMutableList()
         }
+    }
+
+    override fun bindViewEvents() {
+        super.bindViewEvents()
+//        musicListAdapter.itemClick.bindTo {
+//            when (it) {
+//                is MusicListAdapter.OnItemClick.AUDIOITEM -> {
+//                    playAudio(it.data)
+//                }
+//                else -> {}
+//            }
+//        }
+
     }
 
     @NeedsPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
@@ -165,7 +186,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     ): File? {
         return try {
             val stream = context.contentResolver.openInputStream(uri)
-            val file = File.createTempFile(fileName, mimeType, cacheDir)
+            val file = File.createTempFile(fileName, mimeType, activity?.cacheDir)
             FileUtils.copyInputStreamToFile(stream, file)
             file
         } catch (e: Exception) {
@@ -174,7 +195,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         }
     }
 
-    private fun deleteTempFiles(file: File = cacheDir): Boolean {
+    private fun deleteTempFiles(file: File = activity!!.cacheDir): Boolean {
         if (file.isDirectory) {
             val files = file.listFiles()
             if (files != null) {
