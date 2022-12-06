@@ -10,8 +10,8 @@
     <androidx.appcompat.widget.AppCompatImageView
         android:layout_width="wrap_content"
         android:layout_height="0dp"
-        android:scaleType="centerInside"
-        android:src="@drawable/splash_logo"
+        android:scaleType="centerCrop"
+        android:src="@drawable/splash_icon_tech"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
