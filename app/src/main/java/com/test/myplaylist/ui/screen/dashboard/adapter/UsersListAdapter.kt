@@ -43,6 +43,7 @@ internal class UsersListAdapter :
         }
     }
 
+
     internal inner class ViewHolderItem(
         private val binding: ItemUsersListBinding,
     ) : RecyclerView.ViewHolder(binding.root) {

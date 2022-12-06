@@ -6,7 +6,6 @@ import com.test.myplaylist.di.usecase.UseCaseResult
 import com.test.myplaylist.di.usecase.UserCase
 import com.test.myplaylist.domain.model.ImagesList
 import com.test.myplaylist.domain.model.Users
-import com.test.myplaylist.domain.model.UsersList
 import com.test.myplaylist.util.DispatchersProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -57,14 +56,13 @@ class DashBoardViewModel @Inject constructor(
                 "https://media.istockphoto.com/id/480651173/photo/man-with-hi-tech-circuit-theme.jpg?s=612x612&w=0&k=20&c=T6edxqT6H_m6saz8kqozStwTqULxmBRTQl3PjmTpJUY="
             ),
         )
-        getUserList()
+        getUserList(1)
     }
 
-    private fun getUserList() {
+     fun getUserList(position: Int) {
         execute {
-//            showLoading()
             when (val result =
-                userCase.executeUserList()) {
+                userCase.executeUserList(position)) {
                 is UseCaseResult.Success -> {
                     _userList.value = result.data.users as ArrayList<Users> /* = java.util.ArrayList<com.test.myplaylist.domain.model.Users> */
                 }
@@ -75,8 +73,11 @@ class DashBoardViewModel @Inject constructor(
                 is UseCaseResult.Error -> {
                 }
             }
-//            hideLoading()
         }
+    }
+
+    fun fetchUsers(filteredlist: ArrayList<Users>) {
+        _userList.value = filteredlist
     }
 }
 

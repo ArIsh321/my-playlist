@@ -3,14 +3,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
 
-        <androidx.core.widget.NestedScrollView
-            android:layout_width="match_parent"
-            android:fillViewport="true"
-            android:layout_height="match_parent">
-
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
+
+            <include
+                android:id="@+id/includeLayout"
+                layout="@layout/layout_viewpager"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/sdp_200"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/input_layout"
@@ -24,7 +27,7 @@
                 app:hintEnabled="false"
                 app:endIconTint="@color/gray"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" >
+                app:layout_constraintTop_toBottomOf="@+id/includeLayout" >
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etSearchView"
@@ -46,25 +49,14 @@
             </com.google.android.material.textfield.TextInputLayout>
 
 
-            <include
-                android:id="@+id/includeLayout"
-                layout="@layout/layout_viewpager"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/sdp_200"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/input_layout" />
-
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvView"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:nestedScrollingEnabled="false"
                 android:orientation="vertical"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/includeLayout" />
+                app:layout_constraintTop_toBottomOf="@+id/input_layout" />
         </androidx.constraintlayout.widget.ConstraintLayout>
-
-        </androidx.core.widget.NestedScrollView>
 
 </layout>

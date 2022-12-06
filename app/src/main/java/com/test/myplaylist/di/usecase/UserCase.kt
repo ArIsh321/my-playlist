@@ -1,6 +1,5 @@
 package com.test.myplaylist.di.usecase
 
-import com.test.myplaylist.domain.model.UserListResponse
 import com.test.myplaylist.domain.model.UsersList
 import com.test.myplaylist.domain.repository.Repository
 import java.net.ConnectException
@@ -9,9 +8,9 @@ import javax.inject.Inject
 
 class UserCase @Inject constructor(private val repository: Repository) {
 
-    suspend fun executeUserList(): UseCaseResult<UsersList> {
+    suspend fun executeUserList(position: Int): UseCaseResult<UsersList> {
         val queries: MutableMap<String, String> = mutableMapOf()
-        queries["page"] = "1"
+        queries["page"] = position.toString()
         return try {
             val response = repository.userList(queries)
             UseCaseResult.Success(response)
