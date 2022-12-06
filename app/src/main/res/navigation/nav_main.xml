@@ -14,12 +14,22 @@
             android:id="@+id/action_landingFragment_to_homeFragment"
             app:destination="@id/homeFragment"
          />
+        <action
+            android:id="@+id/action_landingFragment_to_dashboardFragment"
+            app:destination="@id/dashboardFragment" />
+
     </fragment>
 
     <fragment
         android:id="@+id/homeFragment"
         android:name="com.test.myplaylist.ui.screen.home.HomeFragment"
         tools:layout="@layout/fragment_home"/>
+
+    <fragment android:id="@+id/dashboardFragment"
+        android:name="com.test.myplaylist.ui.screen.dashboard.DashBoardFragment"
+        tools:layout="@layout/fragment_dashboard">
+
+    </fragment>
 
     <dialog
         android:id="@+id/alertDialog"

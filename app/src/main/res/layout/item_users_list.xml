@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="users"
+            type="com.test.myplaylist.domain.model.Users" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardBackgroundColor="@color/gray"
+            app:cardCornerRadius="@dimen/sdp8"
+            app:cardUseCompatPadding="true"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                style="@style/SelectableItemBackground"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="@dimen/sdp8"
+                android:paddingVertical="@dimen/sdp_16">
+
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/ivUserPhoto"
+                    style="@style/SelectableItemBackground"
+                    android:layout_width="@dimen/sdp_56"
+                    android:layout_height="@dimen/sdp_56"
+                    android:padding="@dimen/sdp_2"
+                    android:scaleType="centerCrop"
+                    app:imageUrlProfileProgress="@{users.avatar}"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.App.CornerSize10Percent"
+                    app:strokeColor="@color/blue"
+                    app:strokeWidth="@dimen/sdp_2" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/sdp_10"
+                    android:text="@{users.firstName}"
+                    android:textColor="@color/blue"
+                    app:layout_constraintBottom_toTopOf="@+id/tvFullName"
+                    app:layout_constraintStart_toEndOf="@+id/ivUserPhoto"
+                    app:layout_constraintTop_toTopOf="@+id/ivUserPhoto"
+                    tools:text="John" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvFullName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/sdp_10"
+                    android:text="@{users.email}"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/ivUserPhoto"
+                    app:layout_constraintTop_toBottomOf="@+id/tvName"
+                    tools:text="John Doe" />
+
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

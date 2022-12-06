@@ -42,5 +42,4 @@ class LandingFragment : BaseFragment<FragmentLandingScreenBinding>() {
     override fun bindViewModel() {
         viewModel.navigator bindTo navigator::navigate
     }
-
 }

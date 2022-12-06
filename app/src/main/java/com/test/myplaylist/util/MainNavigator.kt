@@ -27,7 +27,7 @@ class MainNavigatorImpl @Inject constructor(
         val navController = findNavController()
         when (navController?.currentDestination?.id) {
             R.id.landingFragment -> navController.navigate(
-                LandingFragmentDirections.actionLandingFragmentToHomeFragment()
+                LandingFragmentDirections.actionLandingFragmentToDashboardFragment()
             )
             else -> {
 

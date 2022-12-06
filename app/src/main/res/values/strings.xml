@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">MyPlayList</string>
+    <string name="app_name">DashBoardView</string>
     <string name="error_generic">Something went wrong</string>
     <string name="version">Version %s</string>
     <string name="pick_music">Pick Music From Galley</string>
@@ -8,5 +8,6 @@
     <string name="settings">Setting</string>
     <string name="cancel">cancel</string>
     <string name="ok">Ok</string>
+    <string name="search">Search</string>
 
 </resources>
